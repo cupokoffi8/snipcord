@@ -1,73 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Snap Camera</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      background-color: #f0f0f0;
-    }
-    video {
-      width: 100%;
-      max-width: 600px;
-      border: 2px solid #000;
-    }
-    button {
-      padding: 10px;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-    button:hover {
-      background-color: #45a049;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snap Capture</title>
+    <style>
+        video {
+            width: 100%;
+            height: auto;
+            display: none;
+        }
+        #canvas {
+            display: none;
+        }
+    </style>
 </head>
 <body>
-  <h1>Take a Snap</h1>
-  <video id="video" autoplay></video>
-  <button id="capture">Capture Photo</button>
-  <canvas id="canvas" style="display:none;"></canvas>
+    <h1>Take a Selfie</h1>
+    <button id="startCameraButton">Start Camera</button>
+    <button id="snapButton" style="display:none;">Snap Snapshot</button>
+    <video id="videoElement" autoplay></video>
+    <canvas id="canvas"></canvas>
 
-  <script>
-    const video = document.getElementById('video');
-    const canvas = document.getElementById('canvas');
-    const captureButton = document.getElementById('capture');
+    <script>
+        const startCameraButton = document.getElementById('startCameraButton');
+        const snapButton = document.getElementById('snapButton');
+        const video = document.getElementById('videoElement');
+        const canvas = document.getElementById('canvas');
 
-    // Access the webcam and stream to video element
-    async function setupCamera() {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      video.srcObject = stream;
-    }
+        let stream;
 
-    // Capture the image and send it
-    captureButton.addEventListener('click', () => {
-      const context = canvas.getContext('2d');
-      context.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const imageData = canvas.toDataURL('image/png');
-      sendSnap(imageData); // Send the snap to Discord recipient (after saving on your backend)
-    });
+        // Start the camera when the user clicks 'Start Camera'
+        startCameraButton.addEventListener('click', () => {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(userStream => {
+                    stream = userStream;
+                    video.srcObject = stream;
+                    video.style.display = "block";  // Show the video
+                    startCameraButton.style.display = "none"; // Hide 'Start Camera' button
+                    snapButton.style.display = "inline-block"; // Show 'Snap Snapshot' button
+                })
+                .catch(err => {
+                    console.log("Error accessing camera: ", err);
+                });
+        });
 
-    async function sendSnap(imageData) {
-      // Send the captured image to the server to be stored and sent to the recipient
-      const recipientId = new URLSearchParams(window.location.search).get('recipient'); // Get recipient from URL
-      await fetch('/send-snap', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image: imageData, recipientId }),
-      });
-    }
+        // Take the snapshot when the user clicks 'Snap Snapshot'
+        snapButton.addEventListener('click', () => {
+            const context = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
 
-    setupCamera();
-  </script>
+            // Draw the current frame of the video feed onto the canvas
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Hide the video feed
+            video.style.display = "none";
+
+            // Here you would send the image to Discord or handle it however you like
+            // Convert canvas to a base64 image string to send it to Discord, for example
+            const imageData = canvas.toDataURL('image/png');
+            console.log(imageData);  // You can send this data to your backend or Discord API
+        });
+    </script>
 </body>
 </html>
