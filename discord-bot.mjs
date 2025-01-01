@@ -52,7 +52,7 @@ client.on('interactionCreate', async (interaction) => {
 
     if (targetUser) {
       // Send a link to the web app to take the selfie
-      const selfieUrl = `https://snipcord-.vercel.app?recipient=${targetUser.id}`;
+      const selfieUrl = `https://snipcord.vercel.app?recipient=${targetUser.id}`;
       await interaction.reply({
         content: `Click this link to take a selfie and send it to ${targetUser.username}: ${selfieUrl}`,
         ephemeral: true, // Only visible to the user invoking the command

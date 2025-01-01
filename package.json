@@ -4,7 +4,10 @@
   "description": "Snapchat functionality but in Discord",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy": "npx vercel --prod",
+    "server": "node server.mjs",
+    "bot": "node discord-bot.mjs"
   },
   "keywords": [],
   "author": "",
