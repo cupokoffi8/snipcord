@@ -2,6 +2,17 @@ import express from "express";
 import bodyParser from "body-parser";
 import { WebhookClient } from "discord.js";
 import dotenv from "dotenv";
+import cors from "cors";
+
+// Allow requests from your front-end domain
+const corsOptions = {
+  origin: ["https://snipcord.vercel.app"], // Replace with your actual front-end URLs
+  methods: "GET,POST", // Allow only the required methods
+  allowedHeaders: ["Content-Type"], // Allow only necessary headers
+};
+
+app.use(cors(corsOptions));
+
 
 dotenv.config();
 
