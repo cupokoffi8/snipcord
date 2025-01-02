@@ -46,7 +46,7 @@
             const imageData = canvas.toDataURL('image/png');
 
             // Send the image to the backend server
-            fetch("http://localhost:5001/sendSnap", {
+            fetch("https://late-things-camp.loca.lt/sendSnap", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
