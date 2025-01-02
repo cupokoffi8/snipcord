@@ -7,6 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "deploy": "npx vercel --prod",
     "server": "node server.mjs",
+    "tunnel": "npx lt --port 5001",
     "bot": "node discord-bot.mjs"
   },
   "keywords": [],

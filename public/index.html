@@ -1,71 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snap a Selfie</title>
-    <style>
-        body { text-align: center; padding: 20px; }
-        canvas { border: 2px solid black; }
-        #video { width: 100%; height: auto; }
-        #snapButton { margin-top: 20px; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Snap a Selfie</title>
+  <style>
+    body { text-align: center; padding: 20px; }
+    canvas { display: none; }
+    video { width: 100%; height: auto; }
+    #snapButton { margin-top: 20px; }
+  </style>
 </head>
 <body>
-    <h1>Snap a Selfie</h1>
-    <video id="video" autoplay></video>
-    <canvas id="canvas" width="640" height="480" style="display: none;"></canvas>
-    <button id="snapButton">Snap Screenshot</button>
-    <p id="status"></p>
+  <h1>Snap a Selfie</h1>
+  <video id="video" autoplay></video>
+  <canvas id="canvas" width="640" height="480"></canvas>
+  <button id="snapButton">Snap Screenshot</button>
+  <p id="status"></p>
 
-    <script>
-        const video = document.getElementById('video');
-        const canvas = document.getElementById('canvas');
-        const snapButton = document.getElementById('snapButton');
-        const statusElement = document.getElementById('status');
+  <script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const snapButton = document.getElementById('snapButton');
+    const statusElement = document.getElementById('status');
 
-        let recipientUserId = new URLSearchParams(window.location.search).get('recipient'); // Get recipient ID from the URL
+    // Extract the recipient user ID from the query parameter
+    const recipientUserId = new URLSearchParams(window.location.search).get('recipient');
 
-        // Start video feed from webcam
-        navigator.mediaDevices.getUserMedia({ video: true })
-            .then(stream => {
-                video.srcObject = stream;
-            })
-            .catch(error => {
-                console.error("Error accessing webcam:", error);
-                statusElement.textContent = "Unable to access webcam.";
-            });
+    // Start video feed from the webcam
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => {
+        video.srcObject = stream;
+      })
+      .catch(error => {
+        console.error("Error accessing webcam:", error);
+        statusElement.textContent = "Unable to access webcam.";
+      });
 
-        // Take a screenshot when the snap button is clicked
-        snapButton.addEventListener('click', () => {
-            // Draw the current video frame to the canvas
-            const context = canvas.getContext('2d');
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    // Take a screenshot when the button is clicked
+    snapButton.addEventListener('click', () => {
+      // Draw the current video frame to the canvas
+      const context = canvas.getContext('2d');
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            // Convert the image to base64 string
-            const imageData = canvas.toDataURL('image/png');
+      // Convert the image to base64 and compress it
+      const compressedData = canvas.toDataURL('image/jpeg', 0.7); // JPEG with 70% quality
+      console.log("Compressed image data size:", compressedData.length);
 
-            // Send the image to the backend server
-            fetch("https://late-things-camp.loca.lt/sendSnap", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    recipientId: recipientUserId, // Send recipient's Discord user ID
-                    imageData: imageData, // Base64 image data
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log("Snap sent successfully!", data);
-                statusElement.textContent = "Snap sent successfully!";
-            })
-            .catch(error => {
-                console.error("Error sending snap:", error);
-                statusElement.textContent = "Error sending snap.";
-            });
+      // Send the image to the backend server
+      fetch("https://late-things-camp.loca.lt/sendSnap", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          recipientId: recipientUserId, // Recipient's Discord user ID
+          imageData: compressedData, // Compressed base64 image data
+        }),
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`Server error: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log("Snap sent successfully:", data);
+          statusElement.textContent = "Snap sent successfully!";
+        })
+        .catch(error => {
+          console.error("Error sending snap:", error);
+          statusElement.textContent = "Error sending snap.";
         });
-    </script>
+    });
+  </script>
 </body>
 </html>

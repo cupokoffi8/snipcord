@@ -10,4 +10,5 @@ Snapchat functionality but in Discord
 # Run
 npm run deploy
 npm run server
+npm run tunnel
 npm run bot
