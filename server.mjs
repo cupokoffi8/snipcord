@@ -66,3 +66,5 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+
+//curl -X POST -H "Content-Type: application/json" -d '{"content": "Test message from webhook"}' https://${process.env.TUNNEL_SUBDOMAIN}.loca.lt/sendSnap
