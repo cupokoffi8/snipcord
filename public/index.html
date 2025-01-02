@@ -48,7 +48,7 @@
       console.log("Compressed image data size:", compressedData.length);
 
       // Send the image to the backend server
-      fetch("https://late-things-camp.loca.lt/sendSnap", {
+      fetch(`https://${process.env.TUNNEL_SUBDOMAIN}.loca.lt/sendSnap`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
