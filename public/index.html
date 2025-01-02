@@ -3,64 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snap Capture</title>
+    <title>Snap a Selfie</title>
     <style>
-        video {
-            width: 100%;
-            height: auto;
-            display: none;
-        }
-        #canvas {
-            display: none;
-        }
+        body { text-align: center; padding: 20px; }
+        canvas { border: 2px solid black; }
+        #video { width: 100%; height: auto; }
+        #snapButton { margin-top: 20px; }
     </style>
 </head>
 <body>
-    <h1>Take a Selfie</h1>
-    <button id="startCameraButton">Start Camera</button>
-    <button id="snapButton" style="display:none;">Snap Snapshot</button>
-    <video id="videoElement" autoplay></video>
-    <canvas id="canvas"></canvas>
+    <h1>Snap a Selfie</h1>
+    <video id="video" autoplay></video>
+    <canvas id="canvas" width="640" height="480" style="display: none;"></canvas>
+    <button id="snapButton">Snap Screenshot</button>
+    <p id="status"></p>
 
     <script>
-        const startCameraButton = document.getElementById('startCameraButton');
-        const snapButton = document.getElementById('snapButton');
-        const video = document.getElementById('videoElement');
+        const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
+        const snapButton = document.getElementById('snapButton');
+        const statusElement = document.getElementById('status');
 
-        let stream;
+        let recipientUserId = new URLSearchParams(window.location.search).get('recipient'); // Get recipient ID from the URL
 
-        // Start the camera when the user clicks 'Start Camera'
-        startCameraButton.addEventListener('click', () => {
-            navigator.mediaDevices.getUserMedia({ video: true })
-                .then(userStream => {
-                    stream = userStream;
-                    video.srcObject = stream;
-                    video.style.display = "block";  // Show the video
-                    startCameraButton.style.display = "none"; // Hide 'Start Camera' button
-                    snapButton.style.display = "inline-block"; // Show 'Snap Snapshot' button
-                })
-                .catch(err => {
-                    console.log("Error accessing camera: ", err);
-                });
-        });
+        // Start video feed from webcam
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                video.srcObject = stream;
+            })
+            .catch(error => {
+                console.error("Error accessing webcam:", error);
+                statusElement.textContent = "Unable to access webcam.";
+            });
 
-        // Take the snapshot when the user clicks 'Snap Snapshot'
+        // Take a screenshot when the snap button is clicked
         snapButton.addEventListener('click', () => {
+            // Draw the current video frame to the canvas
             const context = canvas.getContext('2d');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-
-            // Draw the current frame of the video feed onto the canvas
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            // Hide the video feed
-            video.style.display = "none";
-
-            // Here you would send the image to Discord or handle it however you like
-            // Convert canvas to a base64 image string to send it to Discord, for example
+            // Convert the image to base64 string
             const imageData = canvas.toDataURL('image/png');
-            console.log(imageData);  // You can send this data to your backend or Discord API
+
+            // Send the image to the backend server
+            fetch("http://localhost:5001/sendSnap", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    recipientId: recipientUserId, // Send recipient's Discord user ID
+                    imageData: imageData, // Base64 image data
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Snap sent successfully!", data);
+                statusElement.textContent = "Snap sent successfully!";
+            })
+            .catch(error => {
+                console.error("Error sending snap:", error);
+                statusElement.textContent = "Error sending snap.";
+            });
         });
     </script>
 </body>

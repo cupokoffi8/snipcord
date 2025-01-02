@@ -1,4 +1,4 @@
-import { Client, GatewayIntentBits } from 'discord.js';
+import { Client, GatewayIntentBits, WebhookClient } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9';
@@ -9,7 +9,9 @@ dotenv.config();
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
 const TOKEN = process.env.SNAPBOT_TOKEN;
 const CLIENT_ID = process.env.CLIENT_ID;
-//const GUILD_ID = process.env.GUILD_ID; // Optional, if you want to register commands for a specific guild
+const WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL;
+
+const webhook = new WebhookClient({ url: WEBHOOK_URL });
 
 client.once('ready', () => {
   console.log(`${client.user.tag} is online!`);
@@ -60,5 +62,26 @@ client.on('interactionCreate', async (interaction) => {
     }
   }
 });
+
+// Assuming the backend sends an image to Discord via a webhook
+async function sendSnapImage(imageData) {
+  try {
+    const imageBuffer = Buffer.from(imageData.split(',')[1], 'base64');
+    const attachment = { files: [{ attachment: imageBuffer, name: 'snap.png' }] };
+
+    const message = await webhook.send({
+      content: 'You have a new snap! 👀 (Tap to view)',
+      ...attachment,
+    });
+
+    // Delete the message after 10 seconds
+    setTimeout(() => {
+      message.delete();
+    }, 10000); // 10000ms = 10 seconds
+
+  } catch (error) {
+    console.error('Error sending snap:', error);
+  }
+}
 
 client.login(TOKEN);
