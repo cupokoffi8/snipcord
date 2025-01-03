@@ -48,7 +48,7 @@
       console.log("Compressed image data size:", compressedData.length);
 
       // Send the image to the backend server
-      fetch(`https://${process.env.TUNNEL_SUBDOMAIN}.loca.lt/sendSnap`, {
+      fetch(`https://snipcord.fly.dev/sendSnap`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
