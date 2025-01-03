@@ -1,4 +1,4 @@
-import { Client, GatewayIntentBits, REST } from "discord.js";
+import { Client, GatewayIntentBits, REST, Routes } from "discord.js";
 import { SlashCommandBuilder } from "@discordjs/builders";
 import dotenv from "dotenv";
 
@@ -10,6 +10,9 @@ const client = new Client({
 
 const TOKEN = process.env.SNAPBOT_TOKEN;
 const CLIENT_ID = process.env.CLIENT_ID;
+
+// Define the frontend (vercel.app) URL
+const FRONTEND_URL = "https://snipcord.vercel.app";
 
 const commands = [
   new SlashCommandBuilder()
@@ -44,7 +47,8 @@ client.on("interactionCreate", async interaction => {
   const targetUser = interaction.options.getUser("user");
 
   if (targetUser) {
-    const selfieUrl = `https://snipcord.fly.dev?recipient=${targetUser.id}`;
+    // Generate the selfie link using the frontend URL
+    const selfieUrl = `${FRONTEND_URL}?recipient=${targetUser.id}`;
     await interaction.reply({
       content: `Click this link to take a selfie and send it to ${targetUser.username}: ${selfieUrl}`,
       ephemeral: true,

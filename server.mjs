@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors"; // Import CORS middleware
 import { WebhookClient } from "discord.js";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
@@ -8,6 +9,11 @@ dotenv.config();
 // Initialize the Express app
 const app = express();
 const webhook = new WebhookClient({ url: process.env.DISCORD_WEBHOOK_URL });
+
+// Enable CORS for all routes
+app.use(cors({
+  origin: "https://snipcord.vercel.app", // Allow requests from this origin
+}));
 
 app.use(bodyParser.json());
 
