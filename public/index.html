@@ -13,7 +13,7 @@
 </head>
 <body>
   <h1>Snap a Selfie</h1>
-  <video id="video" autoplay></video>
+  <video id="video" autoplay playsinline></video>
   <canvas id="canvas" width="640" height="480"></canvas>
   <button id="snapButton">Snap Screenshot</button>
   <p id="status"></p>
@@ -28,7 +28,7 @@
     const recipientUserId = new URLSearchParams(window.location.search).get('recipient');
 
     // Start video feed from the webcam
-    navigator.mediaDevices.getUserMedia({ video: true })
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } }) // For front-facing camera
       .then(stream => {
         video.srcObject = stream;
       })
@@ -39,6 +39,11 @@
 
     // Take a screenshot when the button is clicked
     snapButton.addEventListener('click', () => {
+      if (!video.srcObject) {
+        statusElement.textContent = "Camera feed is not available.";
+        return;
+      }
+
       // Draw the current video frame to the canvas
       const context = canvas.getContext('2d');
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -48,7 +53,7 @@
       console.log("Compressed image data size:", compressedData.length);
 
       // Send the image to the backend server
-      fetch(`https://snipcord.fly.dev/sendSnap`, {
+      fetch("https://snipcord.fly.dev/sendSnap", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
