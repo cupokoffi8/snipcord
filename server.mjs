@@ -36,7 +36,7 @@ app.post("/sendSnap", async (req, res) => {
     const imageBuffer = Buffer.from(base64Data, "base64");
 
     const message = await webhook.send({
-      content: `You have a new snap from <@${recipientId}>! 👀`,
+      content: `You have a new snap <@${recipientId}>! 👀`,
       files: [{ attachment: imageBuffer, name: "snap.jpg" }],
     });
 
