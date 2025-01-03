@@ -10,10 +10,14 @@ dotenv.config();
 const app = express();
 const webhook = new WebhookClient({ url: process.env.DISCORD_WEBHOOK_URL });
 
-// Enable CORS for all routes
-app.use(cors({
-  origin: "https://snipcord.vercel.app", // Allow requests from this origin
-}));
+// Enable CORS globally
+app.use(
+  cors({
+    origin: "https://snipcord.vercel.app", // Allow requests from this origin
+    methods: ["GET", "POST", "OPTIONS"], // Allow these HTTP methods
+    allowedHeaders: ["Content-Type"], // Allow these headers
+  })
+);
 
 app.use(bodyParser.json());
 
