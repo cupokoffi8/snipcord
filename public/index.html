@@ -28,7 +28,7 @@
     const recipientUserId = new URLSearchParams(window.location.search).get('recipient');
 
     // Start video feed from the webcam
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } }) // For front-facing camera
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
       .then(stream => {
         video.srcObject = stream;
       })

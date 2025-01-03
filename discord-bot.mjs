@@ -8,7 +8,7 @@ const client = new Client({
   intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages],
 });
 
-const TOKEN = process.env.DISCORD_BOT_TOKEN;
+const TOKEN = process.env.SNAPBOT_TOKEN;
 const CLIENT_ID = process.env.CLIENT_ID;
 
 const commands = [
