@@ -4,18 +4,25 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Snap a Selfie</title>
-<style>
+  <style>
     body { 
         text-align: center; 
         padding: 20px; 
         font-family: Arial, sans-serif;
+        background-color: #f9f9f9;
+        color: #333;
+    }
+    h1 {
+        font-size: 24px;
+        margin-bottom: 20px;
     }
     video {
         width: 100%; 
         height: auto; 
         max-width: 400px; 
-        border: 2px solid #000;
+        border: 3px solid #007bff;
         border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
     button {
         display: inline-block;
@@ -26,17 +33,30 @@
         border: none;
         border-radius: 5px;
         font-size: 16px;
+        font-weight: bold;
         cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    button:hover {
+        background-color: #0056b3;
     }
     button:disabled {
         background-color: #cccccc;
+        cursor: not-allowed;
     }
     #status {
         margin-top: 20px;
         font-size: 14px;
         color: #555;
+        max-width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+        word-wrap: break-word;
     }
-</style>
+    canvas {
+        display: none;
+    }
+  </style>
 </head>
 <body>
   <h1>Snap a Selfie</h1>
@@ -98,7 +118,10 @@
         })
         .then(data => {
           console.log("Snap sent successfully:", data);
-          statusElement.textContent = "Snap sent successfully!";
+          statusElement.textContent = "Snap sent successfully! Redirecting...";
+          setTimeout(() => {
+            window.close(); // Close the window on mobile
+          }, 2000); // Delay before closing
         })
         .catch(error => {
           console.error("Error sending snap:", error);
